@@ -19,7 +19,7 @@ namespace Telerik.Sitefinity.Frontend.Navigation.Mvc.Controllers
     [ControllerToolboxItem(Name = "Navigation_MVC", Title = "Navigation", SectionName = ToolboxesConfig.NavigationControlsSectionName, CssClass = NavigationController.WidgetIconCssClass)]
     [Localization(typeof(NavigationResources))]
     [IndexRenderMode(IndexRenderModes.NoOutput)]
-    public class NavigationController : Controller
+    public class NavigationController : ExtendableController
     {
         #region Properties
 
