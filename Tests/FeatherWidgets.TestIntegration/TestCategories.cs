@@ -19,5 +19,6 @@
         public const string Blogs = "Blogs";
         public const string InlineClientAssets = "InlineClientAssets";
         public const string Forms = "Forms";
+        public const string Packages = "Packages";
     }
 }

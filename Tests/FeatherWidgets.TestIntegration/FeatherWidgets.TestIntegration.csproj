@@ -280,6 +280,7 @@
     <Compile Include="News\NewsWidgetListSettingsTests.cs" />
     <Compile Include="News\NewsWidgetPageTemplateTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResourcePackages\PackagesTests.cs" />
     <Compile Include="SearchResults\SearchResultsWidgetTests.cs" />
     <Compile Include="Taxonomies\FlatTaxonomyTests.cs" />
     <Compile Include="Taxonomies\HierarchicalTaxonomyTests.cs" />
