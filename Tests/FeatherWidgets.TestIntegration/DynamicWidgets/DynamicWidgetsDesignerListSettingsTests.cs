@@ -441,10 +441,10 @@ namespace FeatherWidgets.TestIntegration.DynamicWidgets
             }
             finally
             {
-                File.Delete(file);
-                Directory.Delete(this.folderPath);
                 this.pageOperations.DeletePages();
                 ServerOperationsFeather.DynamicModulePressArticle().DeleteDynamicItems(dynamicCollection);
+                File.Delete(file);
+                Directory.Delete(this.folderPath);
             }
         }
 
@@ -498,9 +498,9 @@ namespace FeatherWidgets.TestIntegration.DynamicWidgets
             }
             finally
             {
-                Directory.Delete(this.folderPath);
                 this.pageOperations.DeletePages();
                 ServerOperationsFeather.DynamicModulePressArticle().DeleteDynamicItems(dynamicCollection);
+                Directory.Delete(this.folderPath);
             }
         }
 
