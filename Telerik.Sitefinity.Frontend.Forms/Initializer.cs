@@ -1,6 +1,5 @@
 ﻿using System.Collections.Specialized;
 using System.Linq;
-using System.Web.UI;
 using Telerik.Microsoft.Practices.Unity;
 using Telerik.Sitefinity.Abstractions;
 using Telerik.Sitefinity.Abstractions.VirtualPath;
@@ -9,12 +8,8 @@ using Telerik.Sitefinity.Data;
 using Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers;
 using Telerik.Sitefinity.Frontend.Forms.Mvc.Models.Fields;
 using Telerik.Sitefinity.Modules.ControlTemplates;
-using Telerik.Sitefinity.Modules.Pages;
 using Telerik.Sitefinity.Modules.Pages.Configuration;
 using Telerik.Sitefinity.Mvc.Proxy;
-using Telerik.Sitefinity.Services;
-using Telerik.Sitefinity.Web.UI;
-using Telerik.Sitefinity.Web.UI.ContentUI;
 using Telerik.Sitefinity.Web.UI.ContentUI.Views.Backend.Detail;
 
 namespace Telerik.Sitefinity.Frontend.Forms
@@ -30,10 +25,7 @@ namespace Telerik.Sitefinity.Frontend.Forms
         public static void Initialize()
         {
             ObjectFactory.Container.RegisterType<IFormFieldBackendConfigurator, BackendFieldFallbackConfigurator>(typeof(MvcControllerProxy).FullName);
-
-            EventHub.Unsubscribe<IScriptsRegisteringEvent>(Initializer.RegisteringFormScriptsHandler);
-            EventHub.Subscribe<IScriptsRegisteringEvent>(Initializer.RegisteringFormScriptsHandler);
-
+            
             Bootstrapper.Initialized -= Initializer.Bootstrapper_Initialized;
             Bootstrapper.Initialized += Initializer.Bootstrapper_Initialized;
         }
@@ -43,7 +35,6 @@ namespace Telerik.Sitefinity.Frontend.Forms
         /// </summary>
         public static void Uninitialize()
         {
-            EventHub.Unsubscribe<IScriptsRegisteringEvent>(Initializer.RegisteringFormScriptsHandler);
             Bootstrapper.Initialized -= Initializer.Bootstrapper_Initialized;
 
             Initializer.UnregisterTemplatableControl();
@@ -92,15 +83,6 @@ namespace Telerik.Sitefinity.Frontend.Forms
         private static void UnregisterTemplatableControl()
         {
             ControlTemplates.UnregisterTemplatableControl(new ControlTemplateInfo() { ControlType = typeof(FormController), AreaName = "Form" });
-        }
-
-        private static void RegisteringFormScriptsHandler(IScriptsRegisteringEvent @event)
-        {
-            var zoneEditor = @event.Sender as ZoneEditor;
-            if (zoneEditor != null && zoneEditor.MediaType == DesignMediaType.Form)
-            {
-                @event.Scripts.Add(new ScriptReference(string.Format("~/Frontend-Assembly/{0}/Mvc/Scripts/Form/form.js", typeof(Initializer).Assembly.GetName().Name)));
-            }
         }
 
         private static void RegisterToolboxItem(ToolboxSection section, string name, string title, string controllerType, string cssClass)
