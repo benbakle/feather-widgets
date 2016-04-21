@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FeatherWidgets.TestUtilities.CommonOperations;
+using Telerik.Sitefinity;
 using Telerik.Sitefinity.Frontend.Blogs.Mvc.Models.BlogPost;
 using Telerik.Sitefinity.TestArrangementService.Attributes;
 using Telerik.Sitefinity.TestUI.Arrangements.Framework;
@@ -22,6 +23,7 @@ namespace FeatherWidgets.TestUI.Arrangements
         public void SetUp()
         {
             AuthenticationHelper.AuthenticateUser(AdminUserName, AdminPass, true);
+            App.WorkWith().Blogs().GetManager().Provider.SuppressSecurityChecks = true;
             var templateId = ServerOperations.Templates().GetTemplateIdByTitle(TemplateTitle);
             var pageId = ServerOperations.Pages().CreatePage(DefaultPageTitle, templateId);
             var pageNodeId = ServerOperations.Pages().GetPageNodeId(pageId);
