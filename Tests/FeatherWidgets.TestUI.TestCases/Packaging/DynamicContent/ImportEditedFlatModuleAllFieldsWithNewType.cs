@@ -57,9 +57,8 @@ namespace FeatherWidgets.TestUI.TestCases.Packaging.DynamicContent
         /// </summary>
         protected override void ServerSetup()
         {
-            RuntimeSettingsModificator.ExecuteWithClientTimeout(200000, () => BAT.Macros().User().EnsureAdminLoggedIn());
+            RuntimeSettingsModificator.ExecuteWithClientTimeout(300000, () => BAT.Macros().User().EnsureAdminLoggedIn());
             BAT.Arrange(this.TestName).ExecuteSetUp();
-            BAT.Wrappers().Backend().ModuleBuilder().ModuleInitializerWrapper().WaitForSystemRestart();
         }
 
         /// <summary>
