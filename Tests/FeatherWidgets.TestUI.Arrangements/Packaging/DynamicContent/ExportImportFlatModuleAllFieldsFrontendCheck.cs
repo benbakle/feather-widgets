@@ -64,10 +64,10 @@ namespace FeatherWidgets.TestUI.Arrangements
         [ServerTearDown]
         public void ClearUp()
         {
+            ServerOperations.Pages().DeleteAllPages();
             ServerOperations.ModuleBuilder().DeleteModule(ModuleName, string.Empty, "Module Installations");
             ServerOperations.Packaging().DeleteAllPackagesFromDB();
 
-            ServerOperations.Pages().DeleteAllPages();
             ServerOperations.ModuleBuilder().DeleteDirectory(AppDomain.CurrentDomain.BaseDirectory + @"App_Data\Sitefinity\Export");
             ServerOperations.ModuleBuilder().DeleteDirectory(AppDomain.CurrentDomain.BaseDirectory + @"App_Data\Export");
         }
