@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
+using System.Web.Compilation;
 using FeatherWidgets.TestUtilities.CommonOperations;
 using MbUnit.Framework;
 using Telerik.Sitefinity.Frontend.ContentBlock.Mvc.Controllers;
@@ -63,7 +65,7 @@ namespace FeatherWidgets.TestIntegration.Common
                 var viewPath = "~/Frontend-Assembly/Telerik.Sitefinity.Frontend.ContentBlock/Mvc/Views/ContentBlock/Default.cshtml";
                 var fullViewPath = string.Concat(viewPath, "#Bootstrap.cshtml");
 
-                FeatherServerOperations.ResourcePackages().EditLayoutFile(filePath, widgetText, widgetTextEdited);
+                this.InvalidateAspNetRazorViewCache(fullViewPath);
                 this.WaitForAspNetCacheToBeInvalidated(fullViewPath);
 
                 // Request page
@@ -91,7 +93,6 @@ namespace FeatherWidgets.TestIntegration.Common
             }
             finally
             {
-                FeatherServerOperations.ResourcePackages().EditLayoutFile(filePath, widgetTextEdited, widgetText);
                 this.DeletePages(pageNode);
             }
         }
@@ -134,7 +135,7 @@ namespace FeatherWidgets.TestIntegration.Common
                 var viewPath = "~/Frontend-Assembly/Telerik.Sitefinity.Frontend.ContentBlock/Mvc/Views/ContentBlock/Default.cshtml";
                 var fullViewPath = string.Concat(viewPath, "#Bootstrap.cshtml");
 
-                this.OvewriteFile(filePath);
+                this.InvalidateAspNetRazorViewCache(fullViewPath);
                 this.WaitForAspNetCacheToBeInvalidated(fullViewPath);
 
                 // request page
@@ -177,6 +178,61 @@ namespace FeatherWidgets.TestIntegration.Common
 
             File.Delete(filePath);
             File.WriteAllText(filePath, contents);
+        }
+
+        private void InvalidateAspNetRazorViewCache(string virtualPath)
+        {
+            if (BuildManager.GetCachedBuildDependencySet(null, virtualPath) == null)
+                return;
+
+            var compiledType = BuildManager.GetCompiledType(virtualPath);
+            var compiledTypeAssemblyName = string.Concat(compiledType.Assembly.GetName().Name, ".dll");
+
+            var webCompilationAssembly = typeof(BuildManager).Assembly;
+            var memoryCacheType = webCompilationAssembly.GetType("System.Web.Compilation.MemoryBuildResultCache");
+            var diskCacheType = webCompilationAssembly.GetType("System.Web.Compilation.DiskBuildResultCache");
+
+            var buildManagerInstance = typeof(BuildManager).GetField("_theBuildManager", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+            var caches = (object[])typeof(BuildManager).GetField("_caches", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(buildManagerInstance);
+
+            foreach (var cache in caches)
+            {
+                var cacheType = cache.GetType();
+                if (memoryCacheType.IsAssignableFrom(cacheType))
+                {
+                    this.InvalidateMemoryCache(cache, virtualPath);
+                }
+                else if (diskCacheType.IsAssignableFrom(cacheType))
+                {
+                    this.InvalidateDiskCache(cache, compiledTypeAssemblyName);
+                }
+            }
+        }
+
+        private void InvalidateMemoryCache(object cache, string virtualPath)
+        {
+            var webCompilationAssembly = typeof(BuildManager).Assembly;
+            var virtualPathType = webCompilationAssembly.GetType("System.Web.VirtualPath");
+            var virtualPathCreateMethod = virtualPathType.GetMethod("Create", new Type[] { typeof(string) });
+            var virtualPathObject = virtualPathCreateMethod.Invoke(null, new[] { virtualPath });
+
+            var getCacheKeyMethod = typeof(BuildManager).GetMethod("GetCacheKeyFromVirtualPath", BindingFlags.Static | BindingFlags.NonPublic, null, new Type[] { virtualPathType }, new ParameterModifier[0]);
+            var cacheKey = getCacheKeyMethod.Invoke(null, new[] { virtualPathObject });
+            var getMemoryCacheKey = cache.GetType().GetMethod("GetMemoryCacheKey", BindingFlags.Static | BindingFlags.NonPublic);
+            var key = getMemoryCacheKey.Invoke(null, new[] { cacheKey });
+            var internalCache = cache.GetType().GetField("_cache", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(cache);
+            var removeBuildResult = webCompilationAssembly.GetType("System.Web.Caching.CacheInternal").GetMethod("Remove", BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(string) }, new ParameterModifier[] { });
+            removeBuildResult.Invoke(internalCache, new[] { key });
+        }
+
+        private void InvalidateDiskCache(object cache, string assemblyName)
+        {
+            var webCompilationAssembly = typeof(BuildManager).Assembly;
+            var removeAssemblyMethod = cache.GetType().GetMethod("RemoveAssemblyAndRelatedFiles", BindingFlags.Instance | BindingFlags.NonPublic);
+            removeAssemblyMethod.Invoke(cache, new[] { assemblyName });
+
+            var removeTempFilesMethod = cache.GetType().GetMethod("RemoveOldTempFiles", BindingFlags.Instance | BindingFlags.NonPublic);
+            removeTempFilesMethod.Invoke(cache, new object[] { });
         }
 
         #endregion
