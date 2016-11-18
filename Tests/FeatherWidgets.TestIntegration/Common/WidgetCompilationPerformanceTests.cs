@@ -36,9 +36,6 @@ namespace FeatherWidgets.TestIntegration.Common
         {
             string viewFileName = "Default.cshtml";
             string widgetName = "ContentBlock";
-
-            var widgetText = @"@Html.Raw(Model.Content)";
-            var widgetTextEdited = @"edited @Html.Raw(Model.Content)";
             string filePath = FeatherServerOperations.ResourcePackages().GetResourcePackageMvcViewDestinationFilePath(ResourcePackages.Bootstrap, widgetName, viewFileName);
 
             PageNode pageNode = null;
@@ -66,11 +63,7 @@ namespace FeatherWidgets.TestIntegration.Common
                 var viewPath = "~/Frontend-Assembly/Telerik.Sitefinity.Frontend.ContentBlock/Mvc/Views/ContentBlock/Default.cshtml";
                 var fullViewPath = string.Concat(viewPath, "#Bootstrap.cshtml");
 
-                using (new UnrestrictedModeRegion())
-                {
-                    FeatherServerOperations.ResourcePackages().EditLayoutFile(filePath, widgetText, widgetTextEdited);
-                }
-
+                this.InvalidateAspNetRazorViewCache(fullViewPath, filePath);
                 this.WaitForAspNetCacheToBeInvalidated(fullViewPath);
 
                 // Request page
@@ -98,11 +91,6 @@ namespace FeatherWidgets.TestIntegration.Common
             }
             finally
             {
-                using (new UnrestrictedModeRegion())
-                {
-                    FeatherServerOperations.ResourcePackages().EditLayoutFile(filePath, widgetTextEdited, widgetText);
-                }
-
                 this.DeletePages(pageNode);
             }
         }
@@ -185,11 +173,24 @@ namespace FeatherWidgets.TestIntegration.Common
         {
             using (new UnrestrictedModeRegion())
             {
-                string contents = File.ReadAllText(filePath);
-                contents += " ";
+                string originalContents = File.ReadAllText(filePath);
+                using (var writer = new StreamWriter(File.Open(filePath, FileMode.Create)))
+                {
+                    writer.Write(originalContents);
+                }
+            }
+        }
 
+        private void InvalidateAspNetRazorViewCache(string virtualPath, string filePath)
+        {
+            using (new UnrestrictedModeRegion())
+            {
+                string originalContents = File.ReadAllText(filePath);
                 File.Delete(filePath);
-                File.WriteAllText(filePath, contents);
+
+                this.WaitForAspNetCacheToBeInvalidated(virtualPath);
+
+                File.WriteAllText(filePath, originalContents);
             }
         }
 
