@@ -6,12 +6,16 @@
 
 @Html.Script(ScriptRef.JQuery, "top", false)
 
-<div data-sf-role="field-captcha-container" style="display:none;" class="@Model.CssClass sf-fieldWrp">
+<div data-sf-role="field-captcha-container" style="display:none;" class="@Model.CssClass sf-fieldWrp" role="form" aria-label="Captcha form">
     <div>
         <img data-sf-role="captcha-image" src='@Url.WidgetContent("assets/dist/img/dummy.jpg")'/>
+        @if (Model.EnableCaptchaAudio)
+        {
+            <audio controls data-sf-role="captcha-audio" style="width:48px" aria-label="Play captcha audio"></audio>
+        }
     </div>
 
-    <a data-sf-role="captcha-refresh-button">@Html.Resource("NewCode")</a>
+    <a href="#" data-sf-role="captcha-refresh-button">@Html.Resource("NewCode")</a>
 
     <div>
         <input data-sf-role="violation-messages" type="hidden" value='{"required": "@Model.ValidatorDefinition.RequiredViolationMessage"}' />

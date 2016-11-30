@@ -14,6 +14,14 @@
         bool DisplayOnlyForUnauthenticatedUsers { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether Enable audio code checkbox is displayed.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if Enable audio code checkbox will be displayed; otherwise, <c>false</c>.
+        /// </value>
+        bool EnableCaptchaAudio { get; set; }
+
+        /// <summary>
         /// Should the render captcha.
         /// </summary>
         /// <returns></returns>

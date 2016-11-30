@@ -65,5 +65,13 @@ namespace Telerik.Sitefinity.Frontend.Forms.Mvc.Models.Fields.Captcha
         /// The CSS class.
         /// </value>
         public string CssClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether Enable audio code checkbox is displayed.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if Enable audio code checkbox will be displayed; otherwise, <c>false</c>.
+        /// </value>
+        public bool EnableCaptchaAudio { get; set; }
     }
 }

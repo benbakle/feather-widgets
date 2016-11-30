@@ -27,8 +27,12 @@
             return $.ajax(options);
         },
 
-        getCaptcha: function () {
+        getCaptcha: function (enableAudio) {
             var getCaptchaUrl = this.rootUrl + 'captcha';
+            if (enableAudio) {
+                getCaptchaUrl += '?enableCaptchaAudio=true';
+
+            }
             return this.makeAjax(getCaptchaUrl);
         }
     };
@@ -57,6 +61,7 @@
             return this.wrapper.find('[data-sf-role="' + sfRole + '"]');
         },
         captchaImage: function () { return this.getOrInitializeProperty('_captchaImage', 'captcha-image'); },
+        captchaAudio: function () { return this.getOrInitializeProperty('_captchaAudio', 'captcha-audio'); },
         captchaInput: function () { return this.getOrInitializeProperty('_captchaInput', 'captcha-input'); },
         captchaRefreshLink: function () { return this.getOrInitializeProperty('_captchaRefreshLink', 'captcha-refresh-button'); },
         captchaDataIv: function () { return this.getOrInitializeProperty('_captchaDataIv', 'captcha-iv'); },
@@ -70,11 +75,12 @@
         captchaRefresh: function () {
             var self = this;
             var deferred = $.Deferred();
+            var enableAudio = $('[data-sf-role="captcha-audio"]').length > 0 ? true : false;
 
             self.captchaImage().attr("src", "");
             self.captchaInput().hide();
 
-            self.restApi.getCaptcha().then(function (data) {
+            self.restApi.getCaptcha(enableAudio).then(function (data) {
                 if (data) {
                     self.captchaImage().attr("src", "data:image/png;base64," + data.Image);
                     self.captchaDataIv().val(data.InitializationVector);
@@ -83,6 +89,10 @@
                     self.captchaInput().val("");
                     self.captchaInput().show();
                     self.wrapper.show();
+
+                    if (enableAudio) {
+                        self.captchaAudio().attr("src", "data:audio/wav;base64," + data.Audio);
+                    }
                 }
 
                 deferred.resolve(true);
@@ -149,10 +159,10 @@
             return;
 
         var validationMessages = getValidationMessages(e.target);
-                
+
         if (e.target.validity.valueMissing) {
             e.target.setCustomValidity(validationMessages.required);
-        }        
+        }
     }
 
     /*

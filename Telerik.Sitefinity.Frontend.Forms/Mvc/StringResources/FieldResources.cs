@@ -968,6 +968,21 @@ namespace Telerik.Sitefinity.Frontend.Forms.Mvc.StringResources
         }
 
         /// <summary>
+        /// Gets phrase : Enable audio code
+        /// </summary>
+        [ResourceEntry("EnableAudioCode",
+            Value = "Enable audio code",
+            Description = "phrase: Enable audio code",
+            LastModified = "2016/11/30")]
+        public string EnableAudioCode
+        {
+            get
+            {
+                return this["EnableAudioCode"];
+            }
+        }
+
+        /// <summary>
         /// Gets phrase : Please type the code above
         /// </summary>
         [ResourceEntry("TypeCodeAbove",

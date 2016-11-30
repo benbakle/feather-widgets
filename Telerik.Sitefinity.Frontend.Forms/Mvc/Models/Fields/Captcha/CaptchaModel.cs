@@ -24,6 +24,13 @@ namespace Telerik.Sitefinity.Frontend.Forms.Mvc.Models.Fields.Captcha
         }
 
         /// <inheritDocs/>
+        public bool EnableCaptchaAudio
+        {
+            get;
+            set;
+        }
+
+        /// <inheritDocs/>
         public override object Value
         {
             get
@@ -75,7 +82,8 @@ namespace Telerik.Sitefinity.Frontend.Forms.Mvc.Models.Fields.Captcha
                 CaptchaInitializationVectorFormKey = CaptchaModel.CaptchaInitializationVectorFormKey,
                 CaptchaKeyFormKey = CaptchaModel.CaptchaKeyFormKey,
                 ValidatorDefinition = this.ValidatorDefinition,
-                CssClass = this.CssClass
+                CssClass = this.CssClass,
+                EnableCaptchaAudio = this.EnableCaptchaAudio
             };
         }
 
