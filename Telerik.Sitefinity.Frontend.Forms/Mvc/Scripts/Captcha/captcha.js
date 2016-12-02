@@ -91,7 +91,7 @@
                     self.wrapper.show();
 
                     if (enableAudio) {
-                        self.captchaAudio().attr("src", "data:audio/wav;base64," + data.Audio);
+                        self.captchaAudio().attr("src", "data:audio/mpeg;base64," + data.Audio);
                     }
                 }
 
